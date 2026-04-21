@@ -1,0 +1,34 @@
+name: Build Windows Executable
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # allows manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install pandas pdfplumber openpyxl pyinstaller
+    
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --onefile --windowed --name="InvoiceExtractor" invoice_extractor_gui.py
+    
+    - name: Upload executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: InvoiceExtractor-Windows
+        path: dist/InvoiceExtractor.exe
